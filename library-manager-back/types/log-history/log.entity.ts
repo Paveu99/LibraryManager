@@ -1,5 +1,5 @@
 export type Log = {
-    id: number,
+    id?: number,
     timestamp: string,
     user_id: string,
     action: string,
