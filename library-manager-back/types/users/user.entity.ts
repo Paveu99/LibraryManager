@@ -9,3 +9,5 @@ export type User = {
 }
 
 export type UserDto = Omit<User, "id" | "library_card_code">
+
+export type UserDetials = Omit<User, "password" | "library_card_code">
