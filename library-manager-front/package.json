@@ -5,12 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "lint-staged": "eslint --report-unused-disable-directives --max-warnings 100",
-    "prettify": "prettier --write",
-    "preview": "vite preview",
-    "prepare": "husky install",
-    "typecheck": "tsc --skipLibCheck --allowImportingTsExtensions --esModuleInterop true --noEmit --jsx react-jsx"
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@mui/icons-material": "^6.3.1",
