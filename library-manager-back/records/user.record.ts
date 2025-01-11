@@ -13,7 +13,7 @@ export class UserRecord implements User {
     last_name: string;
     email: string;
     private _password: string;
-    role: "client" | "admin";
+    role: "client" | "admin" | "guest";
     private _library_card_code?: string;
 
     constructor(obj: User) {
