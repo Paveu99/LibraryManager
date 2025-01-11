@@ -1,15 +1,30 @@
-import * as React from 'react'
-import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { Outlet, createRootRoute, createRootRouteWithContext, useLoaderData, useLoaderDeps } from '@tanstack/react-router'
+import { Container } from '../components/containers'
+import { MainHeader } from '../components/header/index'
+import { QueryClient } from '@tanstack/react-query'
+import { Footer } from '../components/footer'
 
-export const Route = createRootRoute({
+type RootContext = {
+    queryClient: QueryClient;
+    role: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+}
+
+export const Route = createRootRouteWithContext<RootContext>()({
     component: RootComponent,
-})
+});
+
+
 
 function RootComponent() {
+
     return (
-        <React.Fragment>
-            <div>Hello "__root"!</div>
+        <Container>
+            <MainHeader />
             <Outlet />
-        </React.Fragment>
+            <Footer />
+        </Container>
     )
 }
