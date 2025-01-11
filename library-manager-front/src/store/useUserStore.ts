@@ -12,10 +12,10 @@ const initialState: UserDetials = {
     first_name: "",
     last_name: "",
     email: "",
-    role: "client"
+    role: "guest"
 };
 
-export const useOrderStore = create<UserDetials & UserActions>()(
+export const useUserStore = create<UserDetials & UserActions>()(
     persist(
         (set) => ({
             ...initialState,
