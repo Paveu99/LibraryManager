@@ -10,36 +10,36 @@ userRouter
     .post('/login', async (req, res) => {
         const userId = req.header('x-user-id') || null;
         try {
-            const { email, password } = req.body;
+            const { library_card_code, password } = req.body;
 
-            if (!email || !password) {
+            if (!library_card_code || !password) {
                 await LogRecord.add(
                     "USER_LOGIN_FAILED",
-                    "Missing email or password.",
+                    "Missing library card code or password.",
                     userId
                 );
                 res.status(400).json({
                     status: "error",
                     error: {
                         code: 400,
-                        message: "Email and password are required.",
+                        message: "Library card code and password are required.",
                     }
                 });
                 return;
             }
 
-            const user = await UserRecord.getOneByEmail(email);
+            const user = await UserRecord.getOneByLibraryCardCode(library_card_code);
             if (!user) {
                 await LogRecord.add(
                     "USER_LOGIN_FAILED",
-                    `Login attempt failed for non-existing email: ${email}`,
+                    `Login attempt failed for non-existing library card code: ${library_card_code}`,
                     userId
                 );
                 res.status(401).json({
                     status: "error",
                     error: {
                         code: 401,
-                        message: "Invalid email or password.",
+                        message: "Invalid library card code or password.",
                     }
                 });
                 return;
@@ -56,7 +56,7 @@ userRouter
                     status: "error",
                     error: {
                         code: 401,
-                        message: "Invalid email or password.",
+                        message: "Invalid library card code or password.",
                     }
                 });
                 return;
@@ -121,10 +121,10 @@ userRouter
             res.status(201).json({
                 status: "success",
                 data: {
-                    id: newUser.id,
                     firstName: newUser.first_name,
                     lastName: newUser.last_name,
                     email: newUser.email,
+                    library_card_code: newUser.library_card_code
                 },
                 message: "User registered successfully."
             });
@@ -132,6 +132,69 @@ userRouter
             await LogRecord.add(
                 "USER_REGISTRATION_ERROR",
                 `Error during registration process: ${error.message}`,
+                userId
+            );
+            res.status(500).json({
+                status: "error",
+                error: {
+                    code: 500,
+                    message: "Internal server error.",
+                }
+            });
+        }
+    })
+
+    .post('/logout', async (req, res) => {
+        const userId = req.header('x-user-id') || null;
+
+        try {
+            if (!userId) {
+                await LogRecord.add(
+                    "USER_LOGOUT_FAILED",
+                    "Logout attempt without user ID.",
+                    null
+                );
+                res.status(400).json({
+                    status: "error",
+                    error: {
+                        code: 400,
+                        message: "User ID is required to logout.",
+                    }
+                });
+                return;
+            }
+
+            const user = await UserRecord.getOneById(userId);
+            if (!user) {
+                await LogRecord.add(
+                    "USER_LOGOUT_FAILED",
+                    `Logout attempt for non-existing user ID: ${userId}`,
+                    userId
+                );
+                res.status(404).json({
+                    status: "error",
+                    error: {
+                        code: 404,
+                        message: "User not found.",
+                    }
+                });
+                return;
+            }
+
+            await LogRecord.add(
+                "USER_LOGOUT_SUCCESS",
+                `User ID: ${userId} logged out successfully.`,
+                userId
+            );
+
+            res.status(200).json({
+                status: "success",
+                message: "Logout successful."
+            });
+        } catch (error) {
+            await LogRecord.add(
+                "USER_LOGOUT_ERROR",
+                `Error during logout process: ${error.message}`,
                 userId
             );
             res.status(500).json({
