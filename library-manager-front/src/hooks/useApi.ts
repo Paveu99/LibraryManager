@@ -3,14 +3,13 @@ export const useApi = () => {
         url: string,
         method: "GET" | "DELETE" | "POST" | "PATCH",
         body?: P,
+        id?: string
     ) => {
-        const userId = localStorage.getItem("userId");
-
         const commonData = {
             method: method,
             headers: {
                 "Content-Type": "application/json",
-                ...(userId ? { "x-user-id": userId } : {}),
+                ...(!!id ? { "x-user-id": id } : {}),
             },
         };
 
@@ -47,8 +46,8 @@ export const useApi = () => {
         return await call<R>(url, "GET")
     }
 
-    const apiPost = async <R, P>(url: string, data: P) => {
-        return await call<R, P>(url, "POST", data)
+    const apiPost = async <R, P>(url: string, data: P, id?: string) => {
+        return await call<R, P>(url, "POST", data, id)
     }
 
     const apiPut = async <R, P>(url: string, data: P) => {
