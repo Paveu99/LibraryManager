@@ -14,9 +14,10 @@ export class UserRecord implements User {
     email: string;
     private _password: string;
     role: "client" | "admin" | "guest";
-    private _library_card_code?: string;
+    library_card_code?: string;
 
     constructor(obj: User) {
+
         if (!obj.first_name || !obj.last_name || !obj.email || !obj.password || !obj.role) {
             throw new ValidationError('All required fields must be provided.');
         }
@@ -27,7 +28,7 @@ export class UserRecord implements User {
         this.email = obj.email;
         this._password = obj.password;
         this.role = obj.role;
-        this._library_card_code = obj.library_card_code;
+        this.library_card_code = obj.library_card_code;
     }
 
     private static async query(sql: string, params: object): Promise<UserRecordsResults> {
@@ -36,6 +37,11 @@ export class UserRecord implements User {
 
     static async getOneByEmail(email: string): Promise<UserRecord | null> {
         const [results] = await this.query("SELECT * FROM `users` WHERE `email` = :email", { email });
+        return results.length ? new UserRecord(results[0]) : null;
+    }
+
+    static async getOneByLibraryCardCode(library_card_code: string): Promise<UserRecord | null> {
+        const [results] = await this.query("SELECT * FROM `users` WHERE `library_card_code` = :library_card_code", { library_card_code });
         return results.length ? new UserRecord(results[0]) : null;
     }
 
@@ -58,8 +64,8 @@ export class UserRecord implements User {
     }
 
     private async setLibraryCardCode(): Promise<void> {
-        if (!this._library_card_code) {
-            this._library_card_code = this.generateUniqueCodeWithTimestamp();
+        if (!this.library_card_code) {
+            this.library_card_code = this.generateUniqueCodeWithTimestamp();
         }
     }
 
@@ -75,7 +81,7 @@ export class UserRecord implements User {
                 last_name: this.last_name,
                 email: this.email,
                 role: this.role,
-                library_card_code: this._library_card_code,
+                library_card_code: this.library_card_code,
                 password: this._password,
             }
         );
@@ -87,9 +93,5 @@ export class UserRecord implements User {
 
     get password(): string {
         return this._password;
-    }
-
-    get library_card_code(): string | undefined {
-        return this._library_card_code;
     }
 }
