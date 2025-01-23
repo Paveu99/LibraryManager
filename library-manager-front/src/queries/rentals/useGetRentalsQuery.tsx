@@ -1,22 +1,21 @@
 import { useQuery } from "@tanstack/react-query"
 import { useApi } from "../../hooks/useApi"
-import { Book } from '../../../../library-manager-back/types/index'
+import { Rental } from '../../../../library-manager-back/types/index'
 import { useUserStore } from "../../store/useUserStore";
 import { useShallow } from "zustand/shallow";
 
-export const useGetBooksQuery = () => {
-
+export const useGetRentalsQuery = () => {
+    const { apiGet } = useApi();
     const { id } = useUserStore(
         useShallow((state) => ({
             id: state.id,
         }))
     );
 
-    const { apiGet } = useApi();
     const { data, refetch, error, isLoading } = useQuery({
-        queryKey: ["books"],
+        queryKey: ["rentals"],
         queryFn: async () => {
-            return apiGet<Book[]>("book", id)
+            return apiGet<Rental[]>("rental", id)
         },
     })
 

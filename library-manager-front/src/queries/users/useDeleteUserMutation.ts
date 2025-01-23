@@ -1,27 +1,29 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "../../hooks/useApi";
 import { useUserStore } from "../../store/useUserStore";
+import { useNavigate } from "@tanstack/react-router";
 import { useShallow } from "zustand/shallow";
 
-export const useLogoutMutation = () => {
-    const { id } = useUserStore(
-        useShallow((state) => ({
-            id: state.id,
-        }))
-    );
-    const { apiPost } = useApi();
+export const useDeleteUserMutation = () => {
+    const { apiDelete } = useApi();
     const queryClient = useQueryClient();
+    const { id, clear } = useUserStore(useShallow((state) => ({ id: state.id, clear: state.clear })));
+    const navigate = useNavigate();
 
     const { mutate, data, error, isPending, isSuccess } = useMutation({
         mutationKey: ["user"],
         mutationFn: async () => {
-            return apiPost<null, null>("user/logout", null, id);
+            return apiDelete<string>(`user/${id}`, id);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["user"],
-            });
+            setTimeout(() => {
+                clear();
+                navigate({ to: '/' });
+            }, 1000)
+
+            queryClient.invalidateQueries({ queryKey: ["user"] });
         },
+
     });
 
     return {
@@ -32,4 +34,3 @@ export const useLogoutMutation = () => {
         isSuccess,
     };
 };
-
