@@ -2,6 +2,7 @@ import Router from "express";
 import { LogRecord } from "../records/logs.record";
 import { RentalRecord } from "../records/rentals.record";
 import { BookRecord } from "../records/books.record";
+import { Rental } from "../types";
 
 export const rentalRouter = Router();
 
@@ -42,6 +43,7 @@ rentalRouter
 
     .get('/user', async (req, res) => {
         const userId = req.header('x-user-id') || null;
+        const { year, month } = req.query
 
         try {
             if (!userId) {
@@ -69,9 +71,38 @@ rentalRouter
                 userId
             );
 
+            let filteredData: Rental[] = rentals;
+
+            if (year) {
+                filteredData = filteredData.filter(el =>
+                    new Date(el.rental_date).getFullYear() === Number(year)
+                );
+                if (month) {
+                    filteredData = filteredData.filter(el =>
+                        new Date(el.rental_date).getMonth() + 1 === Number(month)
+                    );
+                }
+            }
+
             res.status(200).json({
                 status: "success",
-                data: rentals,
+                data: filteredData.sort((a, b) => {
+                    if (a.return_date > b.return_date) {
+                        return -1;
+                    } else if (a.return_date < b.return_date) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }).sort((a, b) => {
+                    if (!a.return_date && b.return_date) {
+                        return -1;
+                    } else if (a.return_date && !b.return_date) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }),
                 message: "Fetched list of their rentals successfully.",
             });
 
