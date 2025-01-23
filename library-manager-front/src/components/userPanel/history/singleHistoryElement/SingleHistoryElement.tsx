@@ -53,6 +53,8 @@ export const SingleHistoryElement = ({ book, el }: SingleHistoryElementProps) =>
         900: '#1C2025',
     };
 
+    if (!book) return <p>Loading...</p>
+
     const ModalContent = styled('div')(
         ({ theme }) => css`
               font-family: 'IBM Plex Sans', sans-serif;
@@ -125,7 +127,7 @@ export const SingleHistoryElement = ({ book, el }: SingleHistoryElementProps) =>
                 className={el.status !== "overdue" ? el.status === "returned" ? styles.green : undefined : styles.red}
                 primary={`${el.status.toUpperCase()}`}
             />
-            {el.status === "returned" ? null : <Button sx={{ backgroundColor: "#C9A66B", color: "#2C3E50", marginLeft: "10px" }} className={styles.return} onClick={openModal}>Return it</Button>}
+            {!!el.return_date ? null : <Button sx={{ backgroundColor: "#C9A66B", color: "#2C3E50", marginLeft: "10px" }} className={styles.return} onClick={openModal}>Return it</Button>}
             <Modal
                 open={open}
                 onClose={closeModal}
