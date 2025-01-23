@@ -4,6 +4,7 @@ import cors from 'cors';
 import { userRouter } from "./routers/user";
 import { bookRouter } from "./routers/books";
 import { rentalRouter } from "./routers/rentals";
+import { startCronJobs } from "./utils/cron-job";
 
 const app = express()
 
@@ -16,6 +17,8 @@ app.use(json());
 app.use('/user', userRouter);
 app.use('/book', bookRouter);
 app.use('/rental', rentalRouter);
+
+startCronJobs();
 
 app.listen(3001, '0.0.0.0', () => {
     console.log('Listening on port http://localhost:3001')
