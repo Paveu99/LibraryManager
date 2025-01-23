@@ -8,37 +8,44 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as UserIndexImport } from './routes/user/index'
 import { Route as RegisterIndexImport } from './routes/register/index'
 import { Route as LogsHistoryIndexImport } from './routes/logs-history/index'
 import { Route as LoginIndexImport } from './routes/login/index'
 import { Route as BooksIndexImport } from './routes/books/index'
 import { Route as AdminIndexImport } from './routes/admin/index'
+import { Route as UserWrapperImport } from './routes/user/_wrapper'
 import { Route as BooksIdImport } from './routes/books/$id'
-import { Route as UserStatsIndexImport } from './routes/user/stats/index'
-import { Route as UserRentalsIndexImport } from './routes/user/rentals/index'
-import { Route as UserDetailsIndexImport } from './routes/user/details/index'
-import { Route as UserDeleteAccountIndexImport } from './routes/user/delete-account/index'
+import { Route as UserWrapperIndexImport } from './routes/user/_wrapper/index'
 import { Route as AdminRentalsIndexImport } from './routes/admin/rentals/index'
 import { Route as AdminBooksIndexImport } from './routes/admin/books/index'
 import { Route as AdminRentalsIdImport } from './routes/admin/rentals/$id'
+import { Route as UserWrapperStatsIndexImport } from './routes/user/_wrapper/stats/index'
+import { Route as UserWrapperRentalsIndexImport } from './routes/user/_wrapper/rentals/index'
+import { Route as UserWrapperDetailsIndexImport } from './routes/user/_wrapper/details/index'
+import { Route as UserWrapperDeleteAccountIndexImport } from './routes/user/_wrapper/delete-account/index'
 import { Route as AdminBooksEditIdImport } from './routes/admin/books/edit/$id'
 
+// Create Virtual Routes
+
+const UserImport = createFileRoute('/user')()
+
 // Create/Update Routes
+
+const UserRoute = UserImport.update({
+  id: '/user',
+  path: '/user',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const UserIndexRoute = UserIndexImport.update({
-  id: '/user/',
-  path: '/user/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -72,34 +79,21 @@ const AdminIndexRoute = AdminIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const UserWrapperRoute = UserWrapperImport.update({
+  id: '/_wrapper',
+  getParentRoute: () => UserRoute,
+} as any)
+
 const BooksIdRoute = BooksIdImport.update({
   id: '/books/$id',
   path: '/books/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
-const UserStatsIndexRoute = UserStatsIndexImport.update({
-  id: '/user/stats/',
-  path: '/user/stats/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const UserRentalsIndexRoute = UserRentalsIndexImport.update({
-  id: '/user/rentals/',
-  path: '/user/rentals/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const UserDetailsIndexRoute = UserDetailsIndexImport.update({
-  id: '/user/details/',
-  path: '/user/details/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const UserDeleteAccountIndexRoute = UserDeleteAccountIndexImport.update({
-  id: '/user/delete-account/',
-  path: '/user/delete-account/',
-  getParentRoute: () => rootRoute,
+const UserWrapperIndexRoute = UserWrapperIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => UserWrapperRoute,
 } as any)
 
 const AdminRentalsIndexRoute = AdminRentalsIndexImport.update({
@@ -119,6 +113,31 @@ const AdminRentalsIdRoute = AdminRentalsIdImport.update({
   path: '/admin/rentals/$id',
   getParentRoute: () => rootRoute,
 } as any)
+
+const UserWrapperStatsIndexRoute = UserWrapperStatsIndexImport.update({
+  id: '/stats/',
+  path: '/stats/',
+  getParentRoute: () => UserWrapperRoute,
+} as any)
+
+const UserWrapperRentalsIndexRoute = UserWrapperRentalsIndexImport.update({
+  id: '/rentals/',
+  path: '/rentals/',
+  getParentRoute: () => UserWrapperRoute,
+} as any)
+
+const UserWrapperDetailsIndexRoute = UserWrapperDetailsIndexImport.update({
+  id: '/details/',
+  path: '/details/',
+  getParentRoute: () => UserWrapperRoute,
+} as any)
+
+const UserWrapperDeleteAccountIndexRoute =
+  UserWrapperDeleteAccountIndexImport.update({
+    id: '/delete-account/',
+    path: '/delete-account/',
+    getParentRoute: () => UserWrapperRoute,
+  } as any)
 
 const AdminBooksEditIdRoute = AdminBooksEditIdImport.update({
   id: '/admin/books/edit/$id',
@@ -143,6 +162,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/books/$id'
       preLoaderRoute: typeof BooksIdImport
       parentRoute: typeof rootRoute
+    }
+    '/user': {
+      id: '/user'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof UserImport
+      parentRoute: typeof rootRoute
+    }
+    '/user/_wrapper': {
+      id: '/user/_wrapper'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof UserWrapperImport
+      parentRoute: typeof UserRoute
     }
     '/admin/': {
       id: '/admin/'
@@ -179,13 +212,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterIndexImport
       parentRoute: typeof rootRoute
     }
-    '/user/': {
-      id: '/user/'
-      path: '/user'
-      fullPath: '/user'
-      preLoaderRoute: typeof UserIndexImport
-      parentRoute: typeof rootRoute
-    }
     '/admin/rentals/$id': {
       id: '/admin/rentals/$id'
       path: '/admin/rentals/$id'
@@ -207,33 +233,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRentalsIndexImport
       parentRoute: typeof rootRoute
     }
-    '/user/delete-account/': {
-      id: '/user/delete-account/'
-      path: '/user/delete-account'
-      fullPath: '/user/delete-account'
-      preLoaderRoute: typeof UserDeleteAccountIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/user/details/': {
-      id: '/user/details/'
-      path: '/user/details'
-      fullPath: '/user/details'
-      preLoaderRoute: typeof UserDetailsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/user/rentals/': {
-      id: '/user/rentals/'
-      path: '/user/rentals'
-      fullPath: '/user/rentals'
-      preLoaderRoute: typeof UserRentalsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/user/stats/': {
-      id: '/user/stats/'
-      path: '/user/stats'
-      fullPath: '/user/stats'
-      preLoaderRoute: typeof UserStatsIndexImport
-      parentRoute: typeof rootRoute
+    '/user/_wrapper/': {
+      id: '/user/_wrapper/'
+      path: '/'
+      fullPath: '/user/'
+      preLoaderRoute: typeof UserWrapperIndexImport
+      parentRoute: typeof UserWrapperImport
     }
     '/admin/books/edit/$id': {
       id: '/admin/books/edit/$id'
@@ -242,67 +247,128 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBooksEditIdImport
       parentRoute: typeof rootRoute
     }
+    '/user/_wrapper/delete-account/': {
+      id: '/user/_wrapper/delete-account/'
+      path: '/delete-account'
+      fullPath: '/user/delete-account'
+      preLoaderRoute: typeof UserWrapperDeleteAccountIndexImport
+      parentRoute: typeof UserWrapperImport
+    }
+    '/user/_wrapper/details/': {
+      id: '/user/_wrapper/details/'
+      path: '/details'
+      fullPath: '/user/details'
+      preLoaderRoute: typeof UserWrapperDetailsIndexImport
+      parentRoute: typeof UserWrapperImport
+    }
+    '/user/_wrapper/rentals/': {
+      id: '/user/_wrapper/rentals/'
+      path: '/rentals'
+      fullPath: '/user/rentals'
+      preLoaderRoute: typeof UserWrapperRentalsIndexImport
+      parentRoute: typeof UserWrapperImport
+    }
+    '/user/_wrapper/stats/': {
+      id: '/user/_wrapper/stats/'
+      path: '/stats'
+      fullPath: '/user/stats'
+      preLoaderRoute: typeof UserWrapperStatsIndexImport
+      parentRoute: typeof UserWrapperImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface UserWrapperRouteChildren {
+  UserWrapperIndexRoute: typeof UserWrapperIndexRoute
+  UserWrapperDeleteAccountIndexRoute: typeof UserWrapperDeleteAccountIndexRoute
+  UserWrapperDetailsIndexRoute: typeof UserWrapperDetailsIndexRoute
+  UserWrapperRentalsIndexRoute: typeof UserWrapperRentalsIndexRoute
+  UserWrapperStatsIndexRoute: typeof UserWrapperStatsIndexRoute
+}
+
+const UserWrapperRouteChildren: UserWrapperRouteChildren = {
+  UserWrapperIndexRoute: UserWrapperIndexRoute,
+  UserWrapperDeleteAccountIndexRoute: UserWrapperDeleteAccountIndexRoute,
+  UserWrapperDetailsIndexRoute: UserWrapperDetailsIndexRoute,
+  UserWrapperRentalsIndexRoute: UserWrapperRentalsIndexRoute,
+  UserWrapperStatsIndexRoute: UserWrapperStatsIndexRoute,
+}
+
+const UserWrapperRouteWithChildren = UserWrapperRoute._addFileChildren(
+  UserWrapperRouteChildren,
+)
+
+interface UserRouteChildren {
+  UserWrapperRoute: typeof UserWrapperRouteWithChildren
+}
+
+const UserRouteChildren: UserRouteChildren = {
+  UserWrapperRoute: UserWrapperRouteWithChildren,
+}
+
+const UserRouteWithChildren = UserRoute._addFileChildren(UserRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/books/$id': typeof BooksIdRoute
+  '/user': typeof UserWrapperRouteWithChildren
   '/admin': typeof AdminIndexRoute
   '/books': typeof BooksIndexRoute
   '/login': typeof LoginIndexRoute
   '/logs-history': typeof LogsHistoryIndexRoute
   '/register': typeof RegisterIndexRoute
-  '/user': typeof UserIndexRoute
   '/admin/rentals/$id': typeof AdminRentalsIdRoute
   '/admin/books': typeof AdminBooksIndexRoute
   '/admin/rentals': typeof AdminRentalsIndexRoute
-  '/user/delete-account': typeof UserDeleteAccountIndexRoute
-  '/user/details': typeof UserDetailsIndexRoute
-  '/user/rentals': typeof UserRentalsIndexRoute
-  '/user/stats': typeof UserStatsIndexRoute
+  '/user/': typeof UserWrapperIndexRoute
   '/admin/books/edit/$id': typeof AdminBooksEditIdRoute
+  '/user/delete-account': typeof UserWrapperDeleteAccountIndexRoute
+  '/user/details': typeof UserWrapperDetailsIndexRoute
+  '/user/rentals': typeof UserWrapperRentalsIndexRoute
+  '/user/stats': typeof UserWrapperStatsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/books/$id': typeof BooksIdRoute
+  '/user': typeof UserWrapperIndexRoute
   '/admin': typeof AdminIndexRoute
   '/books': typeof BooksIndexRoute
   '/login': typeof LoginIndexRoute
   '/logs-history': typeof LogsHistoryIndexRoute
   '/register': typeof RegisterIndexRoute
-  '/user': typeof UserIndexRoute
   '/admin/rentals/$id': typeof AdminRentalsIdRoute
   '/admin/books': typeof AdminBooksIndexRoute
   '/admin/rentals': typeof AdminRentalsIndexRoute
-  '/user/delete-account': typeof UserDeleteAccountIndexRoute
-  '/user/details': typeof UserDetailsIndexRoute
-  '/user/rentals': typeof UserRentalsIndexRoute
-  '/user/stats': typeof UserStatsIndexRoute
   '/admin/books/edit/$id': typeof AdminBooksEditIdRoute
+  '/user/delete-account': typeof UserWrapperDeleteAccountIndexRoute
+  '/user/details': typeof UserWrapperDetailsIndexRoute
+  '/user/rentals': typeof UserWrapperRentalsIndexRoute
+  '/user/stats': typeof UserWrapperStatsIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/books/$id': typeof BooksIdRoute
+  '/user': typeof UserRouteWithChildren
+  '/user/_wrapper': typeof UserWrapperRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/books/': typeof BooksIndexRoute
   '/login/': typeof LoginIndexRoute
   '/logs-history/': typeof LogsHistoryIndexRoute
   '/register/': typeof RegisterIndexRoute
-  '/user/': typeof UserIndexRoute
   '/admin/rentals/$id': typeof AdminRentalsIdRoute
   '/admin/books/': typeof AdminBooksIndexRoute
   '/admin/rentals/': typeof AdminRentalsIndexRoute
-  '/user/delete-account/': typeof UserDeleteAccountIndexRoute
-  '/user/details/': typeof UserDetailsIndexRoute
-  '/user/rentals/': typeof UserRentalsIndexRoute
-  '/user/stats/': typeof UserStatsIndexRoute
+  '/user/_wrapper/': typeof UserWrapperIndexRoute
   '/admin/books/edit/$id': typeof AdminBooksEditIdRoute
+  '/user/_wrapper/delete-account/': typeof UserWrapperDeleteAccountIndexRoute
+  '/user/_wrapper/details/': typeof UserWrapperDetailsIndexRoute
+  '/user/_wrapper/rentals/': typeof UserWrapperRentalsIndexRoute
+  '/user/_wrapper/stats/': typeof UserWrapperStatsIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -310,94 +376,89 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/books/$id'
+    | '/user'
     | '/admin'
     | '/books'
     | '/login'
     | '/logs-history'
     | '/register'
-    | '/user'
     | '/admin/rentals/$id'
     | '/admin/books'
     | '/admin/rentals'
+    | '/user/'
+    | '/admin/books/edit/$id'
     | '/user/delete-account'
     | '/user/details'
     | '/user/rentals'
     | '/user/stats'
-    | '/admin/books/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/books/$id'
+    | '/user'
     | '/admin'
     | '/books'
     | '/login'
     | '/logs-history'
     | '/register'
-    | '/user'
     | '/admin/rentals/$id'
     | '/admin/books'
     | '/admin/rentals'
+    | '/admin/books/edit/$id'
     | '/user/delete-account'
     | '/user/details'
     | '/user/rentals'
     | '/user/stats'
-    | '/admin/books/edit/$id'
   id:
     | '__root__'
     | '/'
     | '/books/$id'
+    | '/user'
+    | '/user/_wrapper'
     | '/admin/'
     | '/books/'
     | '/login/'
     | '/logs-history/'
     | '/register/'
-    | '/user/'
     | '/admin/rentals/$id'
     | '/admin/books/'
     | '/admin/rentals/'
-    | '/user/delete-account/'
-    | '/user/details/'
-    | '/user/rentals/'
-    | '/user/stats/'
+    | '/user/_wrapper/'
     | '/admin/books/edit/$id'
+    | '/user/_wrapper/delete-account/'
+    | '/user/_wrapper/details/'
+    | '/user/_wrapper/rentals/'
+    | '/user/_wrapper/stats/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BooksIdRoute: typeof BooksIdRoute
+  UserRoute: typeof UserRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
   BooksIndexRoute: typeof BooksIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   LogsHistoryIndexRoute: typeof LogsHistoryIndexRoute
   RegisterIndexRoute: typeof RegisterIndexRoute
-  UserIndexRoute: typeof UserIndexRoute
   AdminRentalsIdRoute: typeof AdminRentalsIdRoute
   AdminBooksIndexRoute: typeof AdminBooksIndexRoute
   AdminRentalsIndexRoute: typeof AdminRentalsIndexRoute
-  UserDeleteAccountIndexRoute: typeof UserDeleteAccountIndexRoute
-  UserDetailsIndexRoute: typeof UserDetailsIndexRoute
-  UserRentalsIndexRoute: typeof UserRentalsIndexRoute
-  UserStatsIndexRoute: typeof UserStatsIndexRoute
   AdminBooksEditIdRoute: typeof AdminBooksEditIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BooksIdRoute: BooksIdRoute,
+  UserRoute: UserRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
   BooksIndexRoute: BooksIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   LogsHistoryIndexRoute: LogsHistoryIndexRoute,
   RegisterIndexRoute: RegisterIndexRoute,
-  UserIndexRoute: UserIndexRoute,
   AdminRentalsIdRoute: AdminRentalsIdRoute,
   AdminBooksIndexRoute: AdminBooksIndexRoute,
   AdminRentalsIndexRoute: AdminRentalsIndexRoute,
-  UserDeleteAccountIndexRoute: UserDeleteAccountIndexRoute,
-  UserDetailsIndexRoute: UserDetailsIndexRoute,
-  UserRentalsIndexRoute: UserRentalsIndexRoute,
-  UserStatsIndexRoute: UserStatsIndexRoute,
   AdminBooksEditIdRoute: AdminBooksEditIdRoute,
 }
 
@@ -413,19 +474,15 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/books/$id",
+        "/user",
         "/admin/",
         "/books/",
         "/login/",
         "/logs-history/",
         "/register/",
-        "/user/",
         "/admin/rentals/$id",
         "/admin/books/",
         "/admin/rentals/",
-        "/user/delete-account/",
-        "/user/details/",
-        "/user/rentals/",
-        "/user/stats/",
         "/admin/books/edit/$id"
       ]
     },
@@ -434,6 +491,23 @@ export const routeTree = rootRoute
     },
     "/books/$id": {
       "filePath": "books/$id.tsx"
+    },
+    "/user": {
+      "filePath": "user",
+      "children": [
+        "/user/_wrapper"
+      ]
+    },
+    "/user/_wrapper": {
+      "filePath": "user/_wrapper.tsx",
+      "parent": "/user",
+      "children": [
+        "/user/_wrapper/",
+        "/user/_wrapper/delete-account/",
+        "/user/_wrapper/details/",
+        "/user/_wrapper/rentals/",
+        "/user/_wrapper/stats/"
+      ]
     },
     "/admin/": {
       "filePath": "admin/index.tsx"
@@ -450,9 +524,6 @@ export const routeTree = rootRoute
     "/register/": {
       "filePath": "register/index.tsx"
     },
-    "/user/": {
-      "filePath": "user/index.tsx"
-    },
     "/admin/rentals/$id": {
       "filePath": "admin/rentals/$id.tsx"
     },
@@ -462,20 +533,28 @@ export const routeTree = rootRoute
     "/admin/rentals/": {
       "filePath": "admin/rentals/index.tsx"
     },
-    "/user/delete-account/": {
-      "filePath": "user/delete-account/index.tsx"
-    },
-    "/user/details/": {
-      "filePath": "user/details/index.tsx"
-    },
-    "/user/rentals/": {
-      "filePath": "user/rentals/index.tsx"
-    },
-    "/user/stats/": {
-      "filePath": "user/stats/index.tsx"
+    "/user/_wrapper/": {
+      "filePath": "user/_wrapper/index.tsx",
+      "parent": "/user/_wrapper"
     },
     "/admin/books/edit/$id": {
       "filePath": "admin/books/edit/$id.tsx"
+    },
+    "/user/_wrapper/delete-account/": {
+      "filePath": "user/_wrapper/delete-account/index.tsx",
+      "parent": "/user/_wrapper"
+    },
+    "/user/_wrapper/details/": {
+      "filePath": "user/_wrapper/details/index.tsx",
+      "parent": "/user/_wrapper"
+    },
+    "/user/_wrapper/rentals/": {
+      "filePath": "user/_wrapper/rentals/index.tsx",
+      "parent": "/user/_wrapper"
+    },
+    "/user/_wrapper/stats/": {
+      "filePath": "user/_wrapper/stats/index.tsx",
+      "parent": "/user/_wrapper"
     }
   }
 }
