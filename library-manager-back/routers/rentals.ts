@@ -1,12 +1,14 @@
 import Router from "express";
 import { LogRecord } from "../records/logs.record";
 import { RentalRecord } from "../records/rentals.record";
+import { BookRecord } from "../records/books.record";
 
 export const rentalRouter = Router();
 
 rentalRouter
     .get('/', async (req, res) => {
         const userId = req.header('x-user-id') || null;
+
         try {
             const rentals = await RentalRecord.listAll();
 
@@ -21,6 +23,58 @@ rentalRouter
                 data: rentals,
                 message: "Fetched list of all rentals successfully.",
             });
+        } catch (error) {
+            await LogRecord.add(
+                "RENTALS_LIST_ERROR",
+                `User ${userId} encountered an error while fetching the rental list: ${error.message}`,
+                userId
+            );
+
+            res.status(500).json({
+                status: "error",
+                error: {
+                    code: 500,
+                    message: "Internal server error.",
+                },
+            });
+        }
+    })
+
+    .get('/user', async (req, res) => {
+        const userId = req.header('x-user-id') || null;
+
+        try {
+            if (!userId) {
+                await LogRecord.add(
+                    "RENTAL_VIEW_FAILED",
+                    `User ${userId} attempted to view rentals.`,
+                    userId
+                );
+
+                res.status(404).json({
+                    status: "error",
+                    error: {
+                        code: 404,
+                        message: "Non-existing user.",
+                    },
+                });
+                return;
+            }
+
+            const rentals = await RentalRecord.listByUser(userId);
+
+            await LogRecord.add(
+                "RENTALS_LIST_VIEW",
+                `User ${userId} viewed the list of their rentals.`,
+                userId
+            );
+
+            res.status(200).json({
+                status: "success",
+                data: rentals,
+                message: "Fetched list of their rentals successfully.",
+            });
+
         } catch (error) {
             await LogRecord.add(
                 "RENTALS_LIST_ERROR",
@@ -90,31 +144,151 @@ rentalRouter
         }
     })
 
-    .post('/', async (req, res) => {
+    .post('/rent', async (req, res) => {
         const userId = req.header('x-user-id') || null;
 
         try {
-            const newRental = new RentalRecord(req.body);
-            await newRental.insert();
+            const { bookId } = req.body;
+
+            const book = await BookRecord.getOneById(bookId);
+
+            if (!book) {
+                await LogRecord.add(
+                    "BOOK_NOT_FOUND",
+                    `User ${userId} tried to rent a non-existing book with ID: ${bookId}.`,
+                    userId
+                );
+
+                res.status(404).json({
+                    status: "error",
+                    error: {
+                        code: 404,
+                        message: "Book not found.",
+                    },
+                });
+                return;
+            }
+
+            if (book.available_copies <= 0) {
+                await LogRecord.add(
+                    "BOOK_RENT_NO_COPIES",
+                    `User ${userId} tried to rent a book with ID: ${bookId}, but no copies are available.`,
+                    userId
+                );
+
+                res.status(400).json({
+                    status: "error",
+                    error: {
+                        code: 400,
+                        message: "No copies available for rent.",
+                    },
+                });
+                return;
+            }
+
+            const rental = new RentalRecord({
+                user_id: userId,
+                book_id: bookId,
+                rental_date: new Date().toISOString().split('T')[0],
+                return_date: null,
+                status: "rented",
+            });
+
+            await rental.insert();
+
+            await book.rentBook();
 
             await LogRecord.add(
-                "RENTAL_ADD_SUCCESS",
-                `User ${userId} created a new rental with ID: ${newRental.id}.`,
+                "BOOK_RENT_SUCCESS",
+                `User ${userId} successfully rented a book with ID: ${bookId}.`,
                 userId
             );
 
             res.status(201).json({
                 status: "success",
-                data: {
-                    id: newRental.id,
-                    ...req.body,
-                },
-                message: `Rental created successfully with ID: ${newRental.id}.`,
+                message: `Book with ID ${bookId} rented successfully.`,
             });
         } catch (error) {
             await LogRecord.add(
-                "RENTAL_ADD_ERROR",
-                `User ${userId} encountered an error while adding a rental: ${error.message}`,
+                "RENTAL_PROCESS_ERROR",
+                `User ${userId} encountered an error during renting: ${error.message}`,
+                userId
+            );
+
+            res.status(500).json({
+                status: "error",
+                error: {
+                    code: 500,
+                    message: "Internal server error.",
+                },
+            });
+        }
+    })
+
+    .post('/return', async (req, res) => {
+        const userId = req.header('x-user-id') || null;
+
+        try {
+            const { rentalId } = req.body;
+
+            const rental = await RentalRecord.getOneById(rentalId);
+
+            if (!rental) {
+                await LogRecord.add(
+                    "RENTAL_RETURN_FAILED",
+                    `User ${userId} tried to return a non-existing rental with ID: ${rentalId}.`,
+                    userId
+                );
+
+                res.status(404).json({
+                    status: "error",
+                    error: {
+                        code: 404,
+                        message: "Rental not found.",
+                    },
+                });
+                return;
+            }
+
+            const book = await BookRecord.getOneById(rental.book_id);
+
+            if (!book) {
+                await LogRecord.add(
+                    "BOOK_NOT_FOUND_ON_RETURN",
+                    `User ${userId} tried to return a rental for a non-existing book with ID: ${rental.book_id}.`,
+                    userId
+                );
+
+                res.status(404).json({
+                    status: "error",
+                    error: {
+                        code: 404,
+                        message: "Book not found.",
+                    },
+                });
+                return;
+            }
+
+            await rental.updateStatus("returned");
+
+            await rental.setReturnDate(new Date().toISOString().split('T')[0]);
+
+            await book.returnBook();
+
+            await LogRecord.add(
+                "RENTAL_RETURN_SUCCESS",
+                `User ${userId} successfully returned a rental with ID: ${rentalId}.`,
+                userId
+            );
+
+            res.status(200).json({
+                status: "success",
+                message: `Book with rental ID ${rentalId} returned successfully.`,
+            });
+        } catch (error) {
+            await LogRecord.add(
+                "RETURN_PROCESS_ERROR",
+                `User ${userId} encountered an error during return: ${error.message}`,
                 userId
             );
 
