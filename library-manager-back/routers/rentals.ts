@@ -123,6 +123,111 @@ rentalRouter
         }
     })
 
+    .get('/stats', async (req, res) => {
+        const userId = req.header('x-user-id') || null;
+
+        try {
+            if (!userId) {
+                await LogRecord.add(
+                    "RENTAL_VIEW_FAILED",
+                    `User ${userId} attempted to view stats.`,
+                    userId
+                );
+
+                res.status(404).json({
+                    status: "error",
+                    error: {
+                        code: 404,
+                        message: "Non-existing user.",
+                    },
+                });
+                return;
+            }
+
+            const stats = await RentalRecord.getStatsByUserId(userId);
+
+            await LogRecord.add(
+                "RENTALS_LIST_VIEW",
+                `User ${userId} viewed the list of their rentals.`,
+                userId
+            );
+
+            res.status(200).json({
+                status: "success",
+                data: stats,
+                message: "Fetched list of their rentals successfully.",
+            });
+
+        } catch (error) {
+            await LogRecord.add(
+                "RENTALS_LIST_ERROR",
+                `User ${userId} encountered an error while fetching the statistics list: ${error.message}`,
+                userId
+            );
+
+            res.status(500).json({
+                status: "error",
+                error: {
+                    code: 500,
+                    message: "Internal server error.",
+                },
+            });
+        }
+    })
+
+    .get('/user_stats', async (req, res) => {
+        const userId = req.header('x-user-id') || null;
+        const year = req.query.year ? parseInt(req.query.year as string) : undefined;
+        const month = req.query.month ? parseInt(req.query.month as string) : undefined;
+
+        try {
+            if (!userId) {
+                await LogRecord.add(
+                    "RENTAL_VIEW_FAILED",
+                    `User ${userId} attempted to view stats.`,
+                    userId
+                );
+
+                res.status(404).json({
+                    status: "error",
+                    error: {
+                        code: 404,
+                        message: "Non-existing user."
+                    }
+                });
+                return;
+            }
+
+            const stats = await RentalRecord.getStatsByUserIdPrecise(userId, year, month);
+
+            await LogRecord.add(
+                "RENTALS_LIST_VIEW",
+                `User ${userId} viewed the list of their rentals.`,
+                userId
+            );
+
+            res.status(200).json({
+                status: "success",
+                data: stats,
+                message: "Fetched list of rentals successfully."
+            });
+        } catch (error) {
+            await LogRecord.add(
+                "RENTALS_LIST_ERROR",
+                `User ${userId} encountered an error while fetching the statistics list: ${error.message}`,
+                userId
+            );
+
+            res.status(500).json({
+                status: "error",
+                error: {
+                    code: 500,
+                    message: "Internal server error."
+                }
+            });
+        }
+    })
+
     .get('/:id', async (req, res) => {
         const userId = req.header('x-user-id') || null;
 
