@@ -13,13 +13,13 @@ export const useLogoutMutation = () => {
     const queryClient = useQueryClient();
 
     const { mutate, data, error, isPending, isSuccess } = useMutation({
-        mutationKey: ["userreg"],
+        mutationKey: ["user"],
         mutationFn: async () => {
             return apiPost<null, null>("user/logout", null, id);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["userreg"],
+                queryKey: ["user"],
             });
         },
     });

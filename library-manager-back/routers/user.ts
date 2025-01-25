@@ -238,6 +238,7 @@ userRouter
 
             res.status(200).json({
                 status: "success",
+                data: `User ${id} deleted`,
                 message: "User deleted successfully."
             });
         } catch (error) {

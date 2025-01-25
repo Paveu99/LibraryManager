@@ -23,7 +23,8 @@ export const useLoginUserMutation = () => {
                     first_name: data.first_name,
                     last_name: data.last_name,
                     email: data.email,
-                    role: data.role
+                    role: data.role,
+                    library_card_code: data.library_card_code
                 });
                 navigate({
                     to: '/'

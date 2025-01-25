@@ -38,12 +38,12 @@ export const useApi = () => {
         }
     }
 
-    const apiDelete = async <R>(url: string) => {
-        return await call<R>(url, "DELETE")
+    const apiDelete = async <R>(url: string, id?: string) => {
+        return await call<R>(url, "DELETE", undefined, id)
     }
 
-    const apiGet = async <R>(url: string) => {
-        return await call<R>(url, "GET")
+    const apiGet = async <R>(url: string, id?: string) => {
+        return await call<R>(url, "GET", undefined, id)
     }
 
     const apiPost = async <R, P>(url: string, data: P, id?: string) => {

@@ -12,7 +12,8 @@ const initialState: UserDetials = {
     first_name: "",
     last_name: "",
     email: "",
-    role: "guest"
+    role: "guest",
+    library_card_code: ""
 };
 
 export const useUserStore = create<UserDetials & UserActions>()(

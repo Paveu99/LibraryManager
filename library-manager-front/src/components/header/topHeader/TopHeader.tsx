@@ -2,7 +2,7 @@ import BookIcon from '@mui/icons-material/Book';
 import { useUserStore } from '../../../store/useUserStore';
 import { useShallow } from 'zustand/shallow';
 import styles from './styles.module.scss'
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { Button, Modal } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { styled, css } from '@mui/system';
@@ -23,6 +23,7 @@ export const TopHeader = () => {
     const [open, setOpen] = useState<boolean>(false);
     const [logoutMessage, setLogoutMessage] = useState<string | null>(null);
     const { error, isSuccess, mutate } = useLogoutMutation();
+    const navigate = useNavigate();
 
     const handleOpen = () => {
         setOpen(true);
@@ -43,6 +44,9 @@ export const TopHeader = () => {
             setLogoutMessage('Logout successful')
             setTimeout(() => {
                 setOpen(false);
+                navigate({
+                    to: '/'
+                })
             }, 1000)
         }
     }, [isSuccess])
@@ -156,11 +160,16 @@ export const TopHeader = () => {
                     <Button className={styles.yesNo} sx={{
                         backgroundColor: "#A88453",
                         color: "#F8E8D4"
-                    }} onClick={handleLogOut}>Yes</Button>
+                    }} onClick={handleLogOut}
+                        disabled={logoutMessage ? true : false}
+                    >Yes</Button>
                     <Button className={styles.yesNo} sx={{
                         backgroundColor: "#A88453",
                         color: "#F8E8D4"
-                    }} onClick={handleClose}>No</Button>
+                    }} onClick={handleClose}
+                        disabled={logoutMessage ? true : false}
+
+                    >No</Button>
                 </div>
                 <div className={styles.actions}>
                     {logoutMessage && <p className={styles.success}>{logoutMessage}!!!</p>}

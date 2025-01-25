@@ -2,8 +2,19 @@ import { FieldPacket } from "mysql2";
 import { Rental } from "../types";
 import { pool } from "../utils/db";
 import { ValidationError } from "../utils/errors";
+import { RowDataPacket } from 'mysql2/promise';
 
 type RentalRecordsResults = [RentalRecord[], FieldPacket[]];
+
+type StatsResults = [{ status: string; count: number }[], FieldPacket[]];
+type RentalStatus = 'rented' | 'overdue' | 'returned';
+
+interface RentalStatsRow extends RowDataPacket {
+    year?: number;
+    month?: number;
+    status: RentalStatus;
+    count: number;
+}
 
 export class RentalRecord implements Rental {
     id?: number;
@@ -50,6 +61,91 @@ export class RentalRecord implements Rental {
         );
         return results.map(obj => new RentalRecord(obj));
     }
+
+    static async getStatsByUserId(user_id: string): Promise<{ status: string; count: number }[]> {
+        const [results]: StatsResults = await pool.execute(
+            "SELECT `status`, COUNT(*) as `count` FROM `rentals` WHERE `user_id` = :user_id GROUP BY `status`",
+            { user_id }
+        ) as StatsResults;
+
+        return results.map(row => ({
+            status: row.status,
+            count: row.count,
+        }));
+    }
+
+    static async getStatsByUserIdPrecise(
+        user_id: string,
+        year?: number,
+        month?: number
+    ): Promise<
+        { year?: number; month?: string; rented: number; overdue: number; returned: number }[]
+    > {
+        let query = `
+        SELECT 
+            ${year ? "MONTH(`rental_date`) as `month`, " : "YEAR(`rental_date`) as `year`, "}
+            \`status\`,
+            COUNT(*) as \`count\`
+        FROM 
+            \`rentals\` 
+        WHERE 
+            \`user_id\` = :user_id
+            ${year ? "AND YEAR(`rental_date`) = :year" : ""}
+            ${month ? "AND MONTH(`rental_date`) = :month" : ""}
+        GROUP BY 
+            ${year ? "MONTH(`rental_date`), " : "YEAR(`rental_date`), "}
+            \`status\`
+        ORDER BY 
+            ${year ? "MONTH(`rental_date`) ASC" : "YEAR(`rental_date`) ASC"}
+    `;
+
+        const params: { user_id: string; year?: number; month?: number } = { user_id };
+        if (year) params.year = year;
+        if (month) params.month = month;
+
+        const [results]: [RentalStatsRow[], any[]] = await pool.execute(query, params);
+
+        const stats: Record<string, { rented: number; overdue: number; returned: number }> = {};
+
+        results.forEach(row => {
+            const key = year
+                ? month
+                    ? ""
+                    : `${row.month}`
+                : `${row.year}`;
+
+            if (!stats[key]) {
+                stats[key] = { rented: 0, overdue: 0, returned: 0 };
+            }
+
+            stats[key][row.status as RentalStatus] = row.count;
+        });
+
+        if (year && month) {
+            return [
+                {
+                    rented: stats[""]?.rented || 0,
+                    overdue: stats[""]?.overdue || 0,
+                    returned: stats[""]?.returned || 0
+                }
+            ];
+        } else if (year) {
+            return Object.keys(stats).map(month => ({
+                month: new Date(0, parseInt(month) - 1).toLocaleString('en', { month: 'long' }),
+                rented: stats[month]?.rented || 0,
+                overdue: stats[month]?.overdue || 0,
+                returned: stats[month]?.returned || 0
+            }));
+        } else {
+            return Object.keys(stats).map(year => ({
+                year: parseInt(year),
+                rented: stats[year]?.rented || 0,
+                overdue: stats[year]?.overdue || 0,
+                returned: stats[year]?.returned || 0
+            }));
+        }
+    }
+
 
     static async listByBook(book_id: string): Promise<RentalRecord[]> {
         const [results] = await this.query(
