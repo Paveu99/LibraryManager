@@ -40,6 +40,9 @@ export const BooksList = () => {
     const indexOfFirstPost = indexOfLastPost - rowsPerPage;
     const currentPosts = data?.slice(indexOfFirstPost, indexOfLastPost);
 
+    if (isLoading) return <p>Loading...</p>
+    if (error) return <p>{error.message}</p>
+
     return (
         <main className={styles.categoriesContainer}>
             <div>
