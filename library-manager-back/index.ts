@@ -5,6 +5,7 @@ import { userRouter } from "./routers/user";
 import { bookRouter } from "./routers/books";
 import { rentalRouter } from "./routers/rentals";
 import { startCronJobs } from "./utils/cron-job";
+import { logsRouter } from "./routers/logs";
 
 const app = express()
 
@@ -17,6 +18,7 @@ app.use(json());
 app.use('/user', userRouter);
 app.use('/book', bookRouter);
 app.use('/rental', rentalRouter);
+app.use('/logs', logsRouter);
 
 startCronJobs();
 
