@@ -8,7 +8,7 @@ import styles from './styles.module.scss'
 
 export const DeleteUser = () => {
     const { mutate, isSuccess, error } = useDeleteUserMutation();
-    const { data } = useGetUserRentalsQuery();
+    const { data, error: getError, isLoading } = useGetUserRentalsQuery();
     const [open, setOpen] = useState<boolean>(false);
     const [deleteMessage, setDeleteMessage] = useState<string | null>(null);
 
@@ -108,6 +108,9 @@ export const DeleteUser = () => {
     if (!data) {
         return <p>Loading...</p>;
     }
+
+    if (isLoading) return <p className="warnings">Loading...</p>;
+    if (getError) return <p className="warnings">{getError.message}</p>;
 
     return (
         <div>

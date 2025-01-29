@@ -12,7 +12,7 @@ import { SingleElement } from "../singleElement";
 import { useGetBooksQuery } from "../../../queries/books/useGetBooksQuery";
 
 export const BooksList = () => {
-    const { data, error, isLoading, refetch } = useGetBooksQuery();
+    const { data, error, isLoading } = useGetBooksQuery();
     const [openItemId, setOpenItemId] = useState<string | null>(null);
 
     const handleClick = (id: string) => {
@@ -40,8 +40,8 @@ export const BooksList = () => {
     const indexOfFirstPost = indexOfLastPost - rowsPerPage;
     const currentPosts = data?.slice(indexOfFirstPost, indexOfLastPost);
 
-    if (isLoading) return <p>Loading...</p>
-    if (error) return <p>{error.message}</p>
+    if (isLoading) return <p className="warnings">Loading...</p>;
+    if (error) return <p className="warnings">{error.message}</p>;
 
     return (
         <main className={styles.categoriesContainer}>

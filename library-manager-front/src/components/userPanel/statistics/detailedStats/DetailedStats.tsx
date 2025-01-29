@@ -17,7 +17,7 @@ type Props = {
 export const DetailedStats = ({ allTime }: Props) => {
     const [year, setYear] = useState<string>('');
     const [month, setMonth] = useState<string>('');
-    const { data, isLoading } = useGetPreciseUserStatsQuery<{ month: string; rented: number; overdue: number; returned: number }[]>(Number(year));
+    const { data, isLoading, error } = useGetPreciseUserStatsQuery<{ month: string; rented: number; overdue: number; returned: number }[]>(Number(year));
     const { setChosenFilters } = useFiltersContext();
 
     const handleChange = (value: string) => {
@@ -53,7 +53,8 @@ export const DetailedStats = ({ allTime }: Props) => {
 
     const filteredData = data?.filter(item => month ? item.month === month : true);
 
-    if (isLoading) return <p>Loading detailed stats...</p>;
+    if (isLoading) return <p className="warnings">Loading...</p>;
+    if (error) return <p className="warnings">{error.message}</p>;
 
     return (
         <div>
