@@ -17,13 +17,15 @@ export const useReturnBookMutation = () => {
             return apiPost("rental/return", { rentalId }, id);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["books"],
-            });
+            setTimeout(() => {
+                queryClient.invalidateQueries({
+                    queryKey: ["books"],
+                });
 
-            queryClient.invalidateQueries({
-                queryKey: ["rentals"],
-            });
+                queryClient.invalidateQueries({
+                    queryKey: ["rentals"],
+                });
+            }, 1000)
         }
     });
 
