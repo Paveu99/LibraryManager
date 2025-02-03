@@ -1,0 +1,64 @@
+.return {
+    background-color: #C9A66B;
+    color: #2C3E50;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    margin-left: 10px;
+
+    &:hover {
+        background-color: #A88453;
+        color: #F8E8D4;
+    }
+}
+
+.filters {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.red {
+    color: red;
+}
+
+.green {
+    color: green;
+}
+
+.yesNo {
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    margin: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+
+    &:hover {
+        background-color: #d78668;
+        color: #F8E8D4;
+    }
+
+    &:active {
+        background-color: #8D6E63;
+        color: #F8E8D4;
+        transform: scale(0.95);
+    }
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+}
+
+.success {
+    background-color: green;
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+}
+
+.error {
+    background-color: red;
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+}
