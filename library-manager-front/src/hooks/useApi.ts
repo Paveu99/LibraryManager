@@ -50,14 +50,14 @@ export const useApi = () => {
         return await call<R, P>(url, "POST", data, id)
     }
 
-    const apiPut = async <R, P>(url: string, data: P) => {
-        return await call<R, P>(url, "PATCH", data)
+    const apiPatch = async <R, P>(url: string, data: P, id?: string) => {
+        return await call<R, P>(url, "PATCH", data, id)
     }
 
     return {
         apiGet,
         apiDelete,
         apiPost,
-        apiPut,
+        apiPatch,
     }
 }
