@@ -16,6 +16,7 @@ export class LogRecord implements Log {
             this.action = obj.action,
             this.details = obj.details,
             this.timestamp = obj.timestamp
+        this.user_id = obj.user_id
     }
 
     private static async query(sql: string, params: object): Promise<LogRecordsResults> {

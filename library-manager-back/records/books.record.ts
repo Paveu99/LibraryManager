@@ -1,6 +1,7 @@
 import { FieldPacket } from "mysql2";
 import { Book } from "../types";
 import { pool } from "../utils/db";
+import { v4 as uuid } from "uuid";
 
 type BookRecordsResults = [BookRecord[], FieldPacket[]];
 
@@ -20,17 +21,17 @@ export class BookRecord implements Book {
         if (!obj.author || typeof obj.author !== 'string' || obj.author.trim().length === 0) {
             throw new Error('Author must be a non-empty string.');
         }
-        if (!Number.isInteger(obj.total_copies) || obj.total_copies <= 0) {
-            throw new Error('Total copies must be a positive integer.');
-        }
-        if (!Number.isInteger(obj.available_copies) || obj.available_copies < 0 || obj.available_copies > obj.total_copies) {
-            throw new Error('Available copies must be a non-negative integer and less than or equal to total copies.');
-        }
-        if (!Number.isInteger(obj.year) || obj.year <= 0) {
-            throw new Error('Year must be a positive integer.');
-        }
+        // if (Number(obj.total_copies) || Number(obj.total_copies) <= 0) {
+        //     throw new Error('Total copies must be a positive integer.');
+        // }
+        // if (Number(obj.available_copies) < 0 || Number(obj.available_copies) > Number(obj.total_copies)) {
+        //     throw new Error('Available copies must be a non-negative integer and less than or equal to total copies.');
+        // }
+        // if (Number(obj.year) <= 0) {
+        //     throw new Error('Year must be a positive integer.');
+        // }
 
-        this.id = obj.id;
+        this.id = obj.id || uuid();
         this.author = obj.author;
         this.title = obj.title;
         this.available_copies = obj.available_copies;

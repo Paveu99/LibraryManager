@@ -18,6 +18,9 @@ export const Navigation = () => {
                 role === 'admin' && <Link to='/admin' className={`${styles.step} ${pathname.startsWith('/admin') ? styles.active : ''}`}>Admin Panel</Link>
             }
             {
+                role === 'admin' && <Link to='/logs-history' className={`${styles.step} ${pathname.startsWith('/logs-history') ? styles.active : ''}`}>Log History</Link>
+            }
+            {
                 role === 'client' && <Link to='/user' className={`${styles.step} ${pathname.startsWith('/user') ? styles.active : ''}`}>User Panel</Link>
             }
         </div>

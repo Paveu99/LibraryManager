@@ -21,7 +21,23 @@ rentalRouter
 
             res.status(200).json({
                 status: "success",
-                data: rentals,
+                data: rentals.sort((a, b) => {
+                    if (a.return_date > b.return_date) {
+                        return -1;
+                    } else if (a.return_date < b.return_date) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }).sort((a, b) => {
+                    if (!a.return_date && b.return_date) {
+                        return -1;
+                    } else if (a.return_date && !b.return_date) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }),
                 message: "Fetched list of all rentals successfully.",
             });
         } catch (error) {
@@ -405,15 +421,24 @@ rentalRouter
                 return;
             }
 
-            await rental.updateStatus("returned");
+            const rentDate = new Date(rental.rental_date);
+            const returnDate = new Date();
 
-            await rental.setReturnDate(new Date().toISOString().split('T')[0]);
+            const diffInDays = (returnDate.getTime() - rentDate.getTime()) / (1000 * 60 * 60 * 24);
+
+            if (diffInDays > 14) {
+                await rental.updateStatus("overdue");
+            } else {
+                await rental.updateStatus("returned");
+            }
+
+            await rental.setReturnDate(returnDate.toISOString().split('T')[0]);
 
             await book.returnBook();
 
             await LogRecord.add(
                 "RENTAL_RETURN_SUCCESS",
-                `User ${userId} successfully returned a rental with ID: ${rentalId}.`,
+                `User ${userId} successfully returned a rental with ID: ${rentalId}. Status: ${diffInDays > 14 ? 'overdue' : 'returned'}.`,
                 userId
             );
 

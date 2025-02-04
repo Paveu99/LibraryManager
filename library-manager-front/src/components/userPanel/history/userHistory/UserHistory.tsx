@@ -36,7 +36,9 @@ export const UserHistory = () => {
         return books?.find(book => book.id === el) as Book
     }
 
-    if (isLoading) return <h2>Loading...</h2>
+    if (isLoading) return <p className="warnings">Loading...</p>;
+    if (errorRentals) return <p className="warnings">{errorRentals}</p>;
+    if (errorBooks) return <p className="warnings">{errorBooks}</p>;
 
     if (data?.length === 0) return <h2>No history for this user!</h2>;
 

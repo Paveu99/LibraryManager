@@ -7,7 +7,7 @@ import { FiltersContext } from '../../../context/FiltersContext';
 import styles from './styles.module.scss';
 
 export const Statistics = () => {
-    const { data } = useGetUserStatsQuery();
+    const { data, isLoading, error } = useGetUserStatsQuery();
     const { data: detailedStats } = useGetPreciseUserStatsQuery<{ year: number; rented: number; overdue: number; returned: number }[]>();
     const [chosenFilters, setChosenFilters] = useState<{ year: string, month: string } | null>(null);
 
@@ -22,7 +22,9 @@ export const Statistics = () => {
 
     const valueFormatter = (item: { value: number }) => `${item.value}`;
 
-    if (!detailedStats || !data) return <p>Loading...</p>;
+    if (!detailedStats || !data) return <p className="warnings">Loading...</p>;
+    if (isLoading) return <p className="warnings">Loading...</p>;
+    if (error) return <p className="warnings">{error.message}</p>;
 
     return (
         <FiltersContext.Provider value={{ chosenFilters, setChosenFilters }}>

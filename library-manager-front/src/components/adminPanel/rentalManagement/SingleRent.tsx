@@ -1,35 +1,41 @@
-import { Button, Modal } from "@mui/material";
-import { useGetUserRentalsQuery } from "../../../queries/rentals/useGetUserRentalsQuery";
-import { useDeleteUserMutation } from "../../../queries/users/useDeleteUserMutation"
+import { Book, Rental } from "../../../../../library-manager-back/types";
+import { useReturnBookMutation } from "../../../queries/rentals/useReturnBookMutation";
 import React, { useEffect, useState } from "react";
 import { styled, css } from '@mui/system';
 import clsx from 'clsx';
+import { Button, ListItem, ListItemText, Modal } from "@mui/material";
 import styles from './styles.module.scss'
+import { useCheckDate } from "../../../hooks/useCheckDate";
 
-export const DeleteUser = () => {
-    const { mutate, isSuccess, error } = useDeleteUserMutation();
-    const { data, error: getError, isLoading } = useGetUserRentalsQuery();
+type SingleRentProps = {
+    el: Rental,
+    book: Book
+}
+
+export const SingleRent = ({ book, el }: SingleRentProps) => {
+
+    const { mutate, isSuccess, error } = useReturnBookMutation();
     const [open, setOpen] = useState<boolean>(false);
-    const [deleteMessage, setDeleteMessage] = useState<string | null>(null);
+    const [returnMessage, setReturnMessage] = useState<string | null>(null);
+    const numOfDays = useCheckDate(el.rental_date, el.status);
 
-    const handleOpen = () => {
+    const openModal = () => {
         setOpen(true);
-        setDeleteMessage(null);
-    };
-    const handleClose = () => {
-        setOpen(false);
-        setDeleteMessage(null);
-    };
+        setReturnMessage(null);
+    }
 
-    const deleteUser = () => {
-        if (!isSuccess) {
-            mutate();
-        }
-    };
+    const closeModal = () => {
+        setOpen(false);
+        setReturnMessage(null);
+    }
+
+    const returnBook = (id: number | undefined) => {
+        if (id) mutate(id);
+    }
 
     useEffect(() => {
         if (isSuccess) {
-            setDeleteMessage('User deleted successfully')
+            setReturnMessage('Return successful')
             setTimeout(() => {
                 setOpen(false);
             }, 1000)
@@ -48,6 +54,8 @@ export const DeleteUser = () => {
         800: '#303740',
         900: '#1C2025',
     };
+
+    if (!book) return <p>Loading...</p>
 
     const ModalContent = styled('div')(
         ({ theme }) => css`
@@ -98,31 +106,33 @@ export const DeleteUser = () => {
     });
 
     const StyledBackdrop = styled(Backdrop)`
-          z-index: -1;
-          position: fixed;
-          inset: 0;
-          background-color: rgb(0 0 0 / 0.5);
-          -webkit-tap-highlight-color: transparent;
-        `;
-
-    if (!data) {
-        return <p>Loading...</p>;
-    }
-
-    if (isLoading) return <p className="warnings">Loading...</p>;
-    if (getError) return <p className="warnings">{getError.message}</p>;
+      z-index: -1;
+      position: fixed;
+      inset: 0;
+      background-color: rgb(0 0 0 / 0.5);
+      -webkit-tap-highlight-color: transparent;
+    `;
 
     return (
-        <div>
-            <h2>If a user wants to cancel their membership, they need to return all the books!</h2>
-            <h3>Canceling a membership is equal to deleting the account. Users will no longer be able to log in!</h3>
-            <div style={{ textAlign: "center" }}>
-                <small>Button unlocks only when all the books are returned!</small>
-                <Button className={styles.deleteUser} sx={{ backgroundColor: "red", color: "white", marginLeft: "10px" }} disabled={data?.filter(el => el.status !== "returned").length > 0 ? true : false} onClick={handleOpen}>Cancel membership</Button>
-            </div>
+        <ListItem style={{ width: "100%", marginBottom: "5px", borderRadius: "5px", backgroundColor: numOfDays > 14 ? 'orange' : '#2C3E50', color: '#F8E8D4' }}>
+            <ListItemText
+                sx={{
+                    '& .MuiListItemText-secondary': {
+                        color: '#F8E8D4',
+                    },
+                }}
+                primary={`${book.title} - ${book.author}, ${book.year}`}
+                secondary={`Rented: ${el.rental_date.split('T')[0]}${!el.return_date ? '' : ', Returned: ' + el.return_date.split('T')[0]}`}
+            />
+            <ListItemText
+                sx={{ textAlign: "right" }}
+                className={el.status !== "overdue" ? el.status === "returned" ? styles.green : undefined : styles.red}
+                primary={`${numOfDays > 14 ? 'PAST 14 DAYS MARK' : el.status.toUpperCase()}`}
+            />
+            {!!el.return_date ? null : <Button sx={{ backgroundColor: "#C9A66B", color: "#2C3E50", marginLeft: "10px" }} className={styles.return} onClick={openModal}>Force return</Button>}
             <Modal
                 open={open}
-                onClose={handleClose}
+                onClose={closeModal}
                 aria-labelledby="parent-modal-title"
                 aria-describedby="parent-modal-description"
                 slots={{ backdrop: StyledBackdrop }}
@@ -132,38 +142,37 @@ export const DeleteUser = () => {
                     justifyContent: 'center',
                 }}
             >
-                <ModalContent sx={{ width: 650 }}>
+                <ModalContent sx={{ width: 450 }}>
                     <h2 id="unstyled-modal-title" className="modal-title">
                         Confirmation!!!
                     </h2>
                     <p id="unstyled-modal-description" className="modal-description">
-                        Are you sure that you want to cancel your membership? This action will be irreversable!
+                        Are you sure that you want to return <b>{book.title}</b>?
                     </p>
                     <div style={{ marginTop: "5px", display: 'flex', justifyContent: 'center', width: '100%', gap: '10px' }}>
                         <Button className={styles.yesNo} sx={{
                             backgroundColor: "#A88453",
                             color: "#F8E8D4"
-                        }} onClick={deleteUser}
-                            disabled={deleteMessage ? true : false}
+                        }} onClick={() => returnBook(el.id)}
+                            disabled={returnMessage ? true : false}
                         >Yes</Button>
                         <Button className={styles.yesNo} sx={{
                             backgroundColor: "#A88453",
                             color: "#F8E8D4"
-                        }} onClick={handleClose}
-                            disabled={deleteMessage ? true : false}
-
+                        }} onClick={closeModal}
+                            disabled={returnMessage ? true : false}
                         >No</Button>
                     </div>
                     <div className={styles.actions}>
-                        {deleteMessage && <p className={styles.success}>{deleteMessage}!!!</p>}
+                        {returnMessage && <p className={styles.success}>{returnMessage}!!!</p>}
                         {error && (
                             <p className={styles.error}>
-                                {error?.message || "Error deleting user"}
+                                {error?.message || "Logout failed. Please try again."}
                             </p>
                         )}
                     </div>
                 </ModalContent>
             </Modal>
-        </div>
-    );
-};
+        </ListItem>
+    )
+}
