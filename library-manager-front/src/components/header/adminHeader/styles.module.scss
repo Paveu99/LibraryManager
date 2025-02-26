@@ -1,0 +1,35 @@
+.stepper {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.step {
+    text-decoration: none;
+    color: #F8E8D4;
+    background-color: #2C3E50;
+
+    font-size: 16px;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: background-color 0.3s, color 0.3s;
+
+    &:hover {
+        background-color: #A88453;
+        color: #F8E8D4;
+    }
+}
+
+
+.active {
+    background-color: #C9A66B;
+    color: #2C3E50;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.stepper>.step:last-child {
+    margin-right: 0;
+}
