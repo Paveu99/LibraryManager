@@ -74,9 +74,9 @@ To run the application, follow these steps:
 
 1. If you are using a SQL database, import the provided SQL schema. Locate the Database.sql file in the project root.
 
-Run the following command to import the database schema:
+   Run the following command to import the database schema:
 
-For MySQL:
+   For MySQL:
 
    ```bash
    mysql -u your_username -p your_database < Database.sql
