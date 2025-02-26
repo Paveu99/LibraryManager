@@ -127,7 +127,7 @@ export const SingleHistoryElement = ({ book, el }: SingleHistoryElementProps) =>
                 className={el.status !== "overdue" ? el.status === "returned" ? styles.green : undefined : styles.red}
                 primary={`${el.status.toUpperCase()}`}
             />
-            {!!el.return_date ? null : <Button sx={{ backgroundColor: "#C9A66B", color: "#2C3E50", marginLeft: "10px" }} className={styles.return} onClick={openModal}>Return it</Button>}
+            {!!el.return_date ? null : <Button data-testid={`return-button-${el.id}`} sx={{ backgroundColor: "#C9A66B", color: "#2C3E50", marginLeft: "10px" }} className={styles.return} onClick={openModal}>Return it</Button>}
             <Modal
                 open={open}
                 onClose={closeModal}
@@ -148,10 +148,12 @@ export const SingleHistoryElement = ({ book, el }: SingleHistoryElementProps) =>
                         Are you sure that you want to return <b>{book.title}</b>?
                     </p>
                     <div style={{ marginTop: "5px", display: 'flex', justifyContent: 'center', width: '100%', gap: '10px' }}>
-                        <Button className={styles.yesNo} sx={{
-                            backgroundColor: "#A88453",
-                            color: "#F8E8D4"
-                        }} onClick={() => returnBook(el.id)}
+                        <Button className={styles.yesNo}
+                            data-testid={`return-yes`}
+                            sx={{
+                                backgroundColor: "#A88453",
+                                color: "#F8E8D4"
+                            }} onClick={() => returnBook(el.id)}
                             disabled={returnMessage ? true : false}
                         >Yes</Button>
                         <Button className={styles.yesNo} sx={{
@@ -162,7 +164,9 @@ export const SingleHistoryElement = ({ book, el }: SingleHistoryElementProps) =>
                         >No</Button>
                     </div>
                     <div className={styles.actions}>
-                        {returnMessage && <p className={styles.success}>{returnMessage}!!!</p>}
+                        {returnMessage && <p
+                            data-testid={`return-confirmation`}
+                            className={styles.success}>{returnMessage}!!!</p>}
                         {error && (
                             <p className={styles.error}>
                                 {error?.message || "Logout failed. Please try again."}

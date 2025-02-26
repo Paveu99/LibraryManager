@@ -16,6 +16,8 @@ export const BooksList = () => {
     const [openItemId, setOpenItemId] = useState<string | null>(null);
 
     const handleClick = (id: string) => {
+        console.log(id);
+
         setOpenItemId((prev) => (prev === id ? null : id));
     };
 
@@ -51,6 +53,7 @@ export const BooksList = () => {
                         <div key={el.id}>
                             <ListItemButton
                                 style={{ marginBottom: "5px", borderRadius: "5px", backgroundColor: '#2C3E50', color: '#F8E8D4' }}
+                                data-testid={`book-item-${el.id}`}
                                 onClick={() => handleClick(el.id as string)}
                             >
                                 <ListItemIcon>
@@ -60,6 +63,7 @@ export const BooksList = () => {
                                 {openItemId === el.id ? <ExpandLess /> : <ExpandMore />}
                             </ListItemButton>
                             <Collapse
+                                data-testid={`book-details-${el.id}`}
                                 className={styles.collapse}
                                 in={openItemId === el.id}
                                 timeout="auto"

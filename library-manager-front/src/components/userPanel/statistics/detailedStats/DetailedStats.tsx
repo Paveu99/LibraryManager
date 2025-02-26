@@ -55,6 +55,7 @@ export const DetailedStats = ({ allTime }: Props) => {
 
     if (isLoading) return <p className="warnings">Loading...</p>;
     if (error) return <p className="warnings">{error.message}</p>;
+    if (!data || data.length === 0) return <p>No data available</p>;
 
     return (
         <div>

@@ -45,6 +45,7 @@ export const LoginForm = () => {
                 <h2 className={styles.inputLabel}>Login Form :</h2>
                 <Input
                     id="library_card_code"
+                    data-testid='library_card_code'
                     placeholder="Library card code..."
                     style={{
                         backgroundColor: 'white',
@@ -72,6 +73,7 @@ export const LoginForm = () => {
             <div>
                 <Input
                     id="password"
+                    data-testid='password'
                     placeholder="Password..."
                     style={{
                         backgroundColor: 'white',
@@ -97,6 +99,7 @@ export const LoginForm = () => {
 
             <Button
                 type="submit"
+                data-testid='login_user'
                 disabled={!isValid || isPending}
                 className={styles.loginBtn}
                 sx={{

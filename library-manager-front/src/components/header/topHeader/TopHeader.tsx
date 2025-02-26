@@ -127,8 +127,8 @@ export const TopHeader = () => {
         </div>
         {
             role === "guest" ? <div>
-                <Link to='/login' className={styles.bttn}><Button className={styles.logReg}>Log in</Button></Link>
-                <Link to='/register' className={styles.bttn}><Button className={styles.logReg}>Register</Button></Link>
+                <Link to='/login' className={styles.bttn} data-testid='log-btn'><Button className={styles.logReg}>Log in</Button></Link>
+                <Link to='/register' className={styles.bttn} data-testid='reg-btn'><Button className={styles.logReg}>Register</Button></Link>
             </div> : <div style={{ display: 'flex', justifyContent: "center" }}>
                 <div className={styles.userInfo}>
                     <small>{first_name} {last_name}</small>

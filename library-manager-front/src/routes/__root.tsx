@@ -1,4 +1,4 @@
-import { Outlet, createRootRoute, createRootRouteWithContext, useLoaderData, useLoaderDeps } from '@tanstack/react-router'
+import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
 import { Container } from '../components/containers'
 import { MainHeader } from '../components/header/index'
 import { QueryClient } from '@tanstack/react-query'

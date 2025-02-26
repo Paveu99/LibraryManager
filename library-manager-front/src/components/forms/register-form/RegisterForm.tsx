@@ -63,6 +63,7 @@ export const RegisterForm = () => {
                         <h2 className={styles.inputLabel}>Register Form :</h2>
                         <Input
                             id="first_name"
+                            data-testid='first_name'
                             placeholder="First Name..."
                             style={{
                                 backgroundColor: 'white',
@@ -86,6 +87,7 @@ export const RegisterForm = () => {
                     <div>
                         <Input
                             id="lastName"
+                            data-testid='lastName'
                             placeholder="Last Name..."
                             style={{
                                 backgroundColor: 'white',
@@ -109,6 +111,7 @@ export const RegisterForm = () => {
                     <div>
                         <Input
                             id="email"
+                            data-testid='email'
                             placeholder="Email..."
                             style={{
                                 backgroundColor: 'white',
@@ -136,6 +139,7 @@ export const RegisterForm = () => {
                     <div>
                         <Input
                             id="password"
+                            data-testid='password'
                             placeholder="Password..."
                             style={{
                                 backgroundColor: 'white',
@@ -162,6 +166,7 @@ export const RegisterForm = () => {
 
                     <Button
                         type="submit"
+                        data-testid='register_user'
                         disabled={!isValid || isPending}
                         className={styles.loginBtn}
                         sx={{
@@ -189,6 +194,7 @@ export const RegisterForm = () => {
                         <span>{libraryCardCode}</span>
                         <Button
                             type="button"
+                            data-testid="copy_to_clipboard"
                             onClick={() => copyToClipboard(libraryCardCode)}
                             className={styles.loginBtn}
                             sx={{

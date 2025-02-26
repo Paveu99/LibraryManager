@@ -115,7 +115,7 @@ export const SingleElement = ({ book }: Props) => {
         {role === 'client' ? <Button className={styles.logReg} sx={{
             backgroundColor: '#A88453',
             color: '#F8E8D4'
-        }} onClick={handleOpen} disabled={book.available_copies < 1}>Rent it</Button> : null}
+        }} onClick={handleOpen} data-testid={`rent-button-${book.id}`} disabled={book.available_copies < 1}>Rent it</Button> : null}
         <p>
             Title: <b>{book.title}</b>
         </p>
@@ -151,10 +151,12 @@ export const SingleElement = ({ book }: Props) => {
                     Are you sure that you want to rent <b>{book.title}</b> by <b>{book.author}</b>?
                 </p>
                 <div style={{ marginTop: "5px", display: 'flex', justifyContent: 'center', width: '100%', gap: '10px' }}>
-                    <Button className={styles.yesNo} sx={{
-                        backgroundColor: "#A88453",
-                        color: "#F8E8D4"
-                    }} onClick={handleClick}
+                    <Button className={styles.yesNo}
+                        data-testid={`rent-button-confirmation`}
+                        sx={{
+                            backgroundColor: "#A88453",
+                            color: "#F8E8D4"
+                        }} onClick={handleClick}
                         disabled={rentMessage ? true : false}
                     >Rent</Button>
                     <Button className={styles.yesNo} sx={{
@@ -165,7 +167,9 @@ export const SingleElement = ({ book }: Props) => {
                     >Cancel</Button>
                 </div>
                 <div className={styles.actions}>
-                    {rentMessage && <p className={styles.success}>{rentMessage}!!!</p>}
+                    {rentMessage && <p
+                        data-testid={`confirmation-info`}
+                        className={styles.success}>{rentMessage}!!!</p>}
                     {error && (
                         <p className={styles.error}>
                             {error?.message || "Renting failed. Please try again."}
