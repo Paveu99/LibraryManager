@@ -72,30 +72,40 @@ Here is a demonstration of how the app works:
 
 To run the application, follow these steps:
 
-1. Clone the repository:
+1. If you are using a SQL database, import the provided SQL schema. Locate the Database.sql file in the project root.
+
+Run the following command to import the database schema:
+
+For MySQL:
+
+   ```bash
+   mysql -u your_username -p your_database < Database.sql
+   ```
+
+2. Clone the repository:
     ```bash
     git clone https://github.com/Paveu/LibraryManager.git
     cd library-manager
     ```
 
-2. Install dependencies for back-end:
+3. Install dependencies for back-end:
     ```bash
     cd library-manager-back
     yarn install
     ```
 
-3. Start the backend server:
+4. Start the backend server:
     ```bash
     yarn start:dev
     ```
 
-4. Install dependencies for front-end:
+5. Install dependencies for front-end:
     ```bash
     cd library-manager-front
     yarn install
     ```
 
-5. Start the frontend application:
+6. Start the frontend application:
     ```bash
     yarn dev
     ```
